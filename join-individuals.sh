@@ -15,12 +15,19 @@ randomsub $1 sub1
 randomsub $2 sub2
 
 paste -d' ' sub1.ped sub2.ped > output-temp.ped 			#join the two columns to a temporary file
-echo -e "SIMULATE\nSIM1\n0\n0\n0\n0" > preamble-temp.txt  	#Prepend family and individual ID details onto the PED 'SIMULATE SIM1    0       0       0       0 -'
-cat output-temp.ped >> preamble-temp.txt					
+echo -e "SIMULATE\nSIM1\n0\n0\n0\n0" > preamble-temp.ped  	#Prepend family and individual ID details onto the PED 'SIMULATE SIM1    0       0       0       0 -'
+cat output-temp.ped >> preamble-temp.ped					
 rm output-temp.ped
-mv preamble-temp.txt output-temp.ped
-cat output-temp.ped | tr '\n' '\t' > output.ped 			#convert file back to typical ped "wide" file format - 
-															#i.e. 1 line per individual (in this case there is only one individual)
+mv preamble-temp.ped output-temp.ped
+
+if [ "$3" = "" ]
+then
+	cat output-temp.ped | tr '\n' '\t' > output.ped
+	echo 'Simulated individual saved to output.ped'
+else
+	cat output-temp.ped | tr '\n' '\t' > $3			#convert file back to typical ped "wide" file format - 
+	echo 'Simulated individual saved to '$3
+fi 													#i.e. 1 line per individual (in this case there is only one individual)
 
 rm output-temp.ped
 rm sub1.ped
