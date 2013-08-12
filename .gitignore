@@ -1,0 +1,13 @@
+*.indiv
+*.fam
+*.snps
+*.ped
+*.hom
+*.bim
+*.map
+*.log
+*.in
+*.out
+*.summary
+*.txt
+*.bed
