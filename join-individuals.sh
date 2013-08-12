@@ -1,8 +1,10 @@
 #!/bin/bash
-#Join two individuals
+#Randomly join two individuals
 
-function randomsub {
+#Function to randomly select one of the two base pairs for each line and return a tempoary file called INPUT2.ped
+function randomsub { 
 	RANDOM=$$  # Reseed the random number generator using script process ID.
+	#RANDOM=1000  #Use this option if you'd rather fix the seed
 	cat $1 | tr '\t' '\n' > temp1.ped
 	tail -n +7 temp1.ped > temp2.ped
 	rm temp1.ped
@@ -12,14 +14,13 @@ function randomsub {
 randomsub $1 sub1
 randomsub $2 sub2
 
-paste -d' ' sub1.ped sub2.ped > output-temp.ped
-echo -e "SIMULATE\nSIM1\n0\n0\n0\n0" > preamble-temp.txt
-cat output-temp.ped >> preamble-temp.txt
+paste -d' ' sub1.ped sub2.ped > output-temp.ped 			#join the two columns to a temporary file
+echo -e "SIMULATE\nSIM1\n0\n0\n0\n0" > preamble-temp.txt  	#Prepend family and individual ID details onto the PED 'SIMULATE SIM1    0       0       0       0 -'
+cat output-temp.ped >> preamble-temp.txt					
 rm output-temp.ped
 mv preamble-temp.txt output-temp.ped
-cat output-temp.ped | tr '\n' '\t' > output.ped
-
-#'SIMULATE SIM1    0       0       1       -9'
+cat output-temp.ped | tr '\n' '\t' > output.ped 			#convert file back to typical ped "wide" file format - 
+															#i.e. 1 line per individual (in this case there is only one individual)
 
 rm output-temp.ped
 rm sub1.ped
