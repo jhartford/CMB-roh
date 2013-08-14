@@ -7,12 +7,24 @@ function randomsub {
 	#RANDOM=1000  #Use this option if you'd rather fix the seed
 	cat $1 | tr '\t' '\n' > temp1.ped
 	tail -n +7 temp1.ped > temp2.ped
+	head -$3 temp2.ped > temp3.ped
+	rm temp2.ped
 	rm temp1.ped
-	cat temp2.ped | awk -v seed=$RANDOM 'BEGIN{srand(seed);}{test = rand(); if (test<0.5) print $1; else print $2; }' > $2'.ped'
+	cat temp3.ped | awk -v seed=$RANDOM 'BEGIN{srand(seed);}{test = rand(); if (test<0.5) print $1; else print $2; }' > $2'.ped'
 }
 
-randomsub $1 sub1
-randomsub $2 sub2
+RANGE1=`wc $1 | awk {'print $2'}`
+RANGE2=`wc $2 | awk {'print $2'}`
+
+if [ $RANGE1 -lt $RANGE2 ]
+then
+	MIN=$RANGE1
+else
+	MIN=$RANGE2
+fi
+
+randomsub $1 sub1 $MIN
+randomsub $2 sub2 $MIN
 
 paste -d' ' sub1.ped sub2.ped > output-temp.ped 			#join the two columns to a temporary file
 echo -e "SIMULATE\nSIM1\n0\n0\n0\n0" > preamble-temp.ped  	#Prepend family and individual ID details onto the PED 'SIMULATE SIM1    0       0       0       0 -'
