@@ -46,7 +46,8 @@ class Population:
 		pedFile.close()
 		
 class Person:
-	"""Person class contains all info from a line in a PED file"""
+	"""Person class contains all info from a line in a PED file and a reference to the population map (which lists all)
+	SNPs in that the person has"""
 	def __init__(self, FID, IID, PatID, MatID, Sex, Pheno, map):
 		self.FID = FID
 		self.IID = IID
@@ -58,12 +59,20 @@ class Person:
 		self.map = map
 
 def sample_base(basepair):
-		if random.randint(0,1) == 1:
-			return(basepair[0])
-		else:
-			return(basepair[2])
+	'''
+	Takes a base pair (e.g. 'A T') and returns one of the bases at random
+	'''
+	if random.randint(0,1) == 1:
+		return(basepair[0])
+	else:
+		return(basepair[2])
 
 def make_child(mother,father,id="SYNTH"):
+	'''
+	Takes two Person objects as input and creates a new Person object that is a synthesis of their common SNPs
+	For each common SNP, the new base pair is made up of a random selection of one of the bases from the mother 
+	and one from the father (sex is irrelavent for this method - mother and father are just used for illustration)
+	'''
 	mother_snps = set(mother.map.keys())
 	father_snps = set(father.map.keys())
 	common_snps = mother_snps.intersection(father_snps)
@@ -79,6 +88,10 @@ def make_child(mother,father,id="SYNTH"):
 	return(synth_person)
 
 def person_to_file(pedfile, mapfile, person):
+	'''
+	Takes two open files and a Person object as input and writes the person's data to 
+	PED and MAP files.
+	'''
 	pedfile.write(str(person.FID)+"\t"+str(person.IID)+"\t"+\
 		str(person.PatID)+"\t"+str(person.MatID)+"\t"+\
 		str(person.Sex)+"\t"+str(person.Pheno))
@@ -86,6 +99,10 @@ def person_to_file(pedfile, mapfile, person):
 		pedfile.write("\t"+person.map[bp][4])
 		mapfile.write(bp+'\t'+'\t'.join(map(str,person.map[bp][0:3])) + '\n')
 	pedfile.write("\n")
+
+############################################################################################
+########################	READ PED AND MAP FILES #########################################
+############################################################################################
 
 print("Parsing file 1")
 pop1 = Population()
@@ -98,12 +115,15 @@ pop2.parse_map(str(sys.argv[2]))
 print("Combining files")
 child = make_child(pop1.people[random.randint(0,len(pop1.people))],\
 	pop2.people[random.randint(0,len(pop2.people))])
-print("Writing files to disk")
 
+############################################################################################
+########################	WRITE PED AND MAP FILES ########################################
+############################################################################################
+
+print("Writing files to disk")
 filename = "test-out"
 output_pedfile = open(filename+".ped","w")
 output_mapfile = open(filename+".map","w")
 person_to_file(output_pedfile,output_mapfile,child)
 output_pedfile.close()
 output_mapfile.close()
-
