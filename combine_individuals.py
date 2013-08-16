@@ -1,3 +1,9 @@
+'''
+Script takes two inputs - the filenames of the two populations from which you want to sythesize
+a new person. Currently it only outputs one person but it would be easy to modify it to output many
+people....
+'''
+
 import random
 import copy
 import sys
@@ -113,6 +119,7 @@ pop2 = Population()
 pop2.parse_ped(str(sys.argv[2]))
 pop2.parse_map(str(sys.argv[2]))
 print("Combining files")
+#Create a child out of one random person from each population:
 child = make_child(pop1.people[random.randint(0,len(pop1.people))],\
 	pop2.people[random.randint(0,len(pop2.people))])
 
