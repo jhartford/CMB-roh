@@ -19,7 +19,7 @@ class Population:
 		Create hashtable with SNP id as key and the following value: 
 		[snpnum,chromosome,Genetic distance,Base-pair position,base - e.g. 'A C' ]
 		'''
-		mapFile = open(filename + ".ped")
+		mapFile = open(filename + ".map")
 		plink_map = {}
 		snp_num = 0
 		for line in mapFile:
@@ -28,6 +28,7 @@ class Population:
 			snp_num = snp_num + 1
 		self.maps = plink_map
 		mapFile.close()
+	
 
 	def parse_ped(self,filename,debug = False):
 		'''
@@ -63,6 +64,13 @@ class Person:
 		self.Pheno = Pheno
 		self.SNP = []
 		self.map = map
+		self.binSNP = []
+
+	def convert_snp_to_binary(self):
+		if len(self.binSNP) != len(self.SNP):
+			for snp in self.SNP:
+				self.binSNP.append(int(snp[0]==snp[2]))
+		
 
 def sample_base(basepair):
 	'''
@@ -112,16 +120,31 @@ def person_to_file(pedfile, mapfile, person):
 
 print("Parsing file 1")
 pop1 = Population()
-pop1.parse_ped(str(sys.argv[1]))
 pop1.parse_map(str(sys.argv[1]))
+pop1.parse_ped(str(sys.argv[1]))
+pop1.people[0].convert_snp_to_binary()
+
+'''
+snp_matches = open("bin.txt","w")
+for i in pop1.people[0].binSNP:
+	snp_matches.write(str(i))
+snp_matches.close()
+'''
+
 print("Parsing file 2")
 pop2 = Population()
-pop2.parse_ped(str(sys.argv[2]))
 pop2.parse_map(str(sys.argv[2]))
+pop2.parse_ped(str(sys.argv[2]))
+
 print("Combining files")
+
+person1 = random.randint(0,len(pop1.people)-1)
+print(str(len(pop1.people))+" - " + str(person1))
+person2 = random.randint(0,len(pop2.people)-1)
+print(str(len(pop2.people))+" - " + str(person2))
 #Create a child out of one random person from each population:
-child = make_child(pop1.people[random.randint(0,len(pop1.people))],\
-	pop2.people[random.randint(0,len(pop2.people))])
+child = make_child(pop1.people[person1],pop2.people[person2])
+
 
 ############################################################################################
 ########################	WRITE PED AND MAP FILES ########################################
